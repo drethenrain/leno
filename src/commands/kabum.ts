@@ -7,6 +7,7 @@ import { request } from 'undici';
 
 import Client from '../core/Client';
 import Command from '../core/Command';
+import { currencyFormatToBRL } from '../utils';
 
 export default class extends Command {
   constructor(client: Client) {
@@ -36,7 +37,9 @@ export default class extends Command {
           products
             .map(
               (product) =>
-                `R$${product.price} - [${product.title}](${product.link})`
+                `${currencyFormatToBRL(product.price)} - [${product.title}](${
+                  product.link
+                })`
             )
             .join('\n')
         )
