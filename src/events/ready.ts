@@ -10,6 +10,6 @@ export default class extends Event {
 
   async handle() {
     console.log(`${this.client.user.tag} acordou`);
-    this.client.application.commands.set(this.client.commands as any);
+    this.client.application.commands.set(this.client.commands);
   }
 }

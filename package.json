@@ -10,7 +10,8 @@
     "start": "node -r sucrase/register ."
   },
   "dependencies": {
-    "discord.js": "^14.0.3"
+    "discord.js": "^14.0.3",
+    "undici": "^5.13.0"
   },
   "devDependencies": {
     "dotenv": "^16.0.1",

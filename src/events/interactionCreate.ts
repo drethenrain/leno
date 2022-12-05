@@ -14,7 +14,7 @@ export default class extends Event {
     if (!interaction.isChatInputCommand()) return;
     if (!interaction.guild) return;
 
-    const command: any = this.client.commands.get(interaction.commandName);
+    const command = this.client.commands.get(interaction.commandName);
     if (!command) return;
 
     try {
