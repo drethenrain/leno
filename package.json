@@ -10,7 +10,11 @@
     "start": "node -r sucrase/register ."
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "cloudscraper": "^4.6.0",
     "discord.js": "^14.0.3",
+    "pretty": "^2.0.0",
+    "request": "^2.88.2",
     "undici": "^5.13.0"
   },
   "devDependencies": {
