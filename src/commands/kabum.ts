@@ -1,7 +1,7 @@
 import {
   ApplicationCommandOptionType,
   EmbedBuilder,
-  CommandInteraction,
+  ChatInputCommandInteraction,
 } from 'discord.js';
 import { request } from 'undici';
 
@@ -25,11 +25,11 @@ export default class extends Command {
     });
   }
 
-  async handle(interaction: CommandInteraction) {
+  async handle(interaction: ChatInputCommandInteraction) {
     const embed = new EmbedBuilder();
     try {
       const searchValue = interaction.options.getString('produto');
-      const products = await searchProduct(searchValue);
+      const products = await this.searchProduct(searchValue);
 
       embed
         .setTitle(`Resultados para: ${searchValue} ou similares`)
@@ -37,9 +37,7 @@ export default class extends Command {
           products
             .map(
               (product) =>
-                `${currencyFormatToBRL(product.price)} - [${product.title}](${
-                  product.link
-                })`
+                `${currencyFormatToBRL(product.price)} - [${product.title}](${product.link})`
             )
             .join('\n')
         )
@@ -54,33 +52,35 @@ export default class extends Command {
       interaction.reply('Achei não');
     }
   }
-}
 
-async function searchProduct(product: string) {
-  const baseUrl = 'https://servicespub.prod.api.aws.grupokabum.com.br';
-  const productUrl = (id: string) => `https://www.kabum.com.br/produto/${id}`;
+  private async searchProduct(product: string) {
+    const baseUrl = 'https://servicespub.prod.api.aws.grupokabum.com.br';
+    const productUrl = (id: string) => `https://www.kabum.com.br/produto/${id}`;
 
-  const { body } = await request(
-    `${baseUrl}/catalog/v2/products?query=${product}&page_size=10`,
-    {
-      headers: {
-        'user-agent': 'Mozilla/5.0 Chrome/108.0.0.0 Safari/537.36',
-      },
+    const { body } = await request(
+      `${baseUrl}/catalog/v2/products?query=${product}&page_size=15`,
+      {
+        headers: {
+          'user-agent': 'Mozilla/5.0 Chrome/108.0.0.0 Safari/537.36',
+        },
+      }
+    );
+
+    const { data } = await body.json();
+
+    const products = [];
+    for (const product of data) {
+      const { id, attributes } = product;
+
+      products.push({
+        title: attributes.title,
+        price: attributes.price,
+        link: productUrl(id),
+        photos: attributes.photos,
+      });
     }
-  );
-
-  const { data } = await body.json();
-
-  const products = [];
-  for (const product of data) {
-    const { id, attributes } = product;
-
-    products.push({
-      title: attributes.title,
-      price: attributes.price,
-      link: productUrl(id),
-      photos: attributes.photos,
-    });
+    return products;
   }
-  return products;
+
 }
+

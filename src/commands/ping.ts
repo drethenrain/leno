@@ -1,4 +1,4 @@
-import { Interaction } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 
 import Client from '../core/Client';
 import Command from '../core/Command';
@@ -11,7 +11,7 @@ export default class extends Command {
     });
   }
 
-  handle(interaction: Interaction & any) {
+  handle(interaction: CommandInteraction) {
     interaction.reply(`:ping_pong: ${this.client.ws.ping}ms`);
   }
 }

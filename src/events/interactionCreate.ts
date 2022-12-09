@@ -14,14 +14,13 @@ export default class extends Event {
     if (!interaction.isChatInputCommand()) return;
     if (!interaction.guild) return;
 
-    const command = this.client.commands.get(interaction.commandName);
-    if (!command) return;
-
     try {
-      await command.handle(interaction);
+      const command = this.client.commands.get(interaction.commandName);
+      if (!command) return;
+
+      command.handle(interaction);
     } catch (error) {
-      console.error(error);
-      await interaction.reply({
+      interaction.reply({
         content: 'Deu erro',
         ephemeral: true,
       });

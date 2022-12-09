@@ -1,9 +1,11 @@
+import { ApplicationCommandOptionData, Interaction } from 'discord.js';
 import Client from './Client';
 
 type Config = {
   name: string;
   description: string;
-  options?: object;
+  devOnly?: boolean;
+  options?: ApplicationCommandOptionData[];
 };
 
 class Command {
@@ -20,6 +22,8 @@ class Command {
     this.description = config.description;
     this.options = config.options;
   }
+
+  handle(...args) { }
 }
 
 export default Command;

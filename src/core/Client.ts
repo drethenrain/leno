@@ -1,9 +1,11 @@
 import { readdirSync } from 'fs';
 import { join } from 'path';
 import { ActivityType, Client as BaseClient, Collection } from 'discord.js';
+import Command from './Command';
 
 class Client extends BaseClient {
-  commands: Collection<unknown, unknown>;
+  commands: Collection<string, Command>;
+  developers: string[]
 
   constructor() {
     super({
@@ -11,17 +13,18 @@ class Client extends BaseClient {
       presence: {
         status: process.env.NODE_ENV === 'development' ? 'dnd' : 'online',
         activities: [
-          { name: 'O Mito, é bolso neles!!', type: ActivityType.Watching },
+          { name: 'SECRETAAAAAAAAAAAARIA', type: ActivityType.Listening },
         ],
       },
     });
 
     this.commands = new Collection();
+    this.developers = process.env.DEVELOPERS
     this.registryEvents();
     this.registryCommands();
   }
 
-  registryEvents() {
+  private registryEvents() {
     const events = readdirSync(`${process.cwd()}/src/events`);
 
     for (const event of events) {
@@ -34,7 +37,7 @@ class Client extends BaseClient {
     }
   }
 
-  registryCommands() {
+  private registryCommands() {
     const commands = readdirSync(`${process.cwd()}/src/commands`);
 
     for (const command of commands) {
