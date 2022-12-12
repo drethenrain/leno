@@ -28,13 +28,12 @@ export default class extends Command {
     const embed = new EmbedBuilder();
     try {
       const stockValue = interaction.options.getString('stock');
-      const requestAll = await this.requestAllStocks();
 
       if (stockValue) {
+        const reqAll = await this.requestAllStocks();
+
         const data = await this.requestStock(stockValue);
-        const data2 = requestAll.find(
-          (a) => a.stock === stockValue.toUpperCase()
-        );
+        const data2 = reqAll.find((d) => d.stock === stockValue.toUpperCase());
 
         interaction.reply({
           embeds: [
@@ -78,15 +77,17 @@ export default class extends Command {
           ],
         });
       } else {
+        const data = await this.requestLimitStocks(60);
+
         interaction.reply({
           embeds: [
             embed
               .setTitle('Lista de ações listadas na Bovespa')
               .setDescription(
-                requestAll.map((d) => `${d.name} - ${d.stock}`).join('\n')
+                data.map((d) => `${d.name} - ${d.stock}`).join('\n')
               )
               .setFooter({
-                text: `Mostrando apenas ${requestAll.length} ações`,
+                text: `Mostrando apenas ${data.length} ações`,
               }),
           ],
         });
@@ -97,7 +98,16 @@ export default class extends Command {
   }
 
   private async requestAllStocks() {
-    const { body } = await request(`https://brapi.dev/api/quote/list?limit=60`);
+    const { body } = await request(`https://brapi.dev/api/quote/list`);
+    const { stocks } = await body.json();
+
+    return stocks;
+  }
+
+  private async requestLimitStocks(limit: number) {
+    const { body } = await request(
+      `https://brapi.dev/api/quote/list?limit=${limit}`
+    );
     const { stocks } = await body.json();
 
     return stocks;
