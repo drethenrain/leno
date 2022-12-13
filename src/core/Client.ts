@@ -5,7 +5,7 @@ import Command from './Command';
 
 class Client extends BaseClient {
   commands: Collection<string, Command>;
-  developers: string[]
+  developers: string[];
 
   constructor() {
     super({
@@ -19,13 +19,15 @@ class Client extends BaseClient {
     });
 
     this.commands = new Collection();
-    this.developers = process.env.DEVELOPERS
+    this.developers = process.env.DEVELOPERS;
     this.registryEvents();
     this.registryCommands();
   }
 
   private registryEvents() {
-    const events = readdirSync(`${process.cwd()}/src/events`);
+    const events = readdirSync(`${process.cwd()}/src/events`).filter(
+      (f) => f.endsWith('.ts') || f.endsWith('.js')
+    );
 
     for (const event of events) {
       const EventBase = require(join(
@@ -38,13 +40,16 @@ class Client extends BaseClient {
   }
 
   private registryCommands() {
-    const commands = readdirSync(`${process.cwd()}/src/commands`);
+    const commands = readdirSync(`${process.cwd()}/src/commands`).filter(
+      (f) => f.endsWith('.ts') || f.endsWith('.js')
+    );
 
     for (const command of commands) {
       const CommandBase = require(join(
         `${process.cwd()}/src/commands/${command}`
       )).default;
       const cmd = new CommandBase(this);
+
       this.commands.set(cmd.name, cmd);
     }
   }
