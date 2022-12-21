@@ -5,11 +5,13 @@ export default class extends Event {
   constructor(client: Client) {
     super(client, {
       name: 'ready',
+      emitter: 'once'
     });
   }
 
-  async handle() {
-    console.log(`${this.client.user.tag} acordou`);
+  handle() {
     this.client.application.commands.set(this.client.commands);
+
+    console.log(`${this.client.user.tag} acordou`);
   }
 }

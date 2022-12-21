@@ -1,57 +1,44 @@
-import { readdirSync } from 'fs';
-import { join } from 'path';
-import { ActivityType, Client as BaseClient, Collection } from 'discord.js';
+import { ActivityType, Client as BaseClient } from 'discord.js';
+
 import Command from './Command';
+import Event from './Event';
+import { readFolder } from '../utils';
+
+type Constructable<T> = new (...args: unknown[]) => T;
 
 class Client extends BaseClient {
-  commands: Collection<string, Command>;
+  commands: Command[]
   developers: string[];
 
   constructor() {
     super({
-      intents: ['Guilds'],
+      intents: ['Guilds', 'GuildMembers'],
       presence: {
         status: process.env.NODE_ENV === 'development' ? 'dnd' : 'online',
         activities: [
-          { name: 'SECRETAAAAAAAAAAAARIA', type: ActivityType.Listening },
+          { name: 'Caneta Azul', type: ActivityType.Listening },
         ],
       },
     });
 
-    this.commands = new Collection();
     this.developers = process.env.DEVELOPERS;
     this.registryEvents();
     this.registryCommands();
   }
 
   private registryEvents() {
-    const events = readdirSync(`${process.cwd()}/src/events`).filter(
-      (f) => f.endsWith('.ts') || f.endsWith('.js')
-    );
+    readFolder<Constructable<Event>>('../events')
+      .map((Event) => new Event(this))
+      .forEach((evt) => this[evt.emitter](evt.name, (...args: unknown[]) => evt.handle(...args)));
 
-    for (const event of events) {
-      const EventBase = require(join(
-        `${process.cwd()}/src/events/${event}`
-      )).default;
-      const evt = new EventBase(this);
-
-      this.on(evt.name, (...args) => evt.handle(...args));
-    }
+    return this;
   }
 
   private registryCommands() {
-    const commands = readdirSync(`${process.cwd()}/src/commands`).filter(
-      (f) => f.endsWith('.ts') || f.endsWith('.js')
-    );
+    this.commands = readFolder<Constructable<Command>>('../commands')
+      .map((Command) => new Command(this));
 
-    for (const command of commands) {
-      const CommandBase = require(join(
-        `${process.cwd()}/src/commands/${command}`
-      )).default;
-      const cmd = new CommandBase(this);
-
-      this.commands.set(cmd.name, cmd);
-    }
+    return this;
   }
 
   connect() {

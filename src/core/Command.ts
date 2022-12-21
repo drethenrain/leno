@@ -1,7 +1,7 @@
-import { ApplicationCommandOptionData, Interaction } from 'discord.js';
+import { ApplicationCommandOptionData, CommandInteraction } from 'discord.js';
 import Client from './Client';
 
-type Config = {
+interface Config {
   name: string;
   description: string;
   devOnly?: boolean;
@@ -10,20 +10,22 @@ type Config = {
 
 class Command {
   client: Client;
-  config: Config;
 
   name: string;
   description: string;
-  options?: object;
+  options: ApplicationCommandOptionData[];
 
-  constructor(client: Client, config: Config) {
+  constructor(client: Client, data: Config) {
+    Object.assign(this, data);
+
     this.client = client;
-    this.name = config.name;
-    this.description = config.description;
-    this.options = config.options;
   }
 
-  handle(...args) { }
+  handle(interaction: any) {
+    return {
+      ...interaction
+    }
+  }
 }
 
 export default Command;

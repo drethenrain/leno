@@ -7,23 +7,14 @@ export default class extends Event {
   constructor(client: Client) {
     super(client, {
       name: 'interactionCreate',
+      emitter: 'on'
     });
   }
 
-  async handle(interaction: Interaction) {
-    if (!interaction.isChatInputCommand()) return;
-    if (!interaction.guild) return;
+  handle(interaction: Interaction) {
+    if (!interaction.isCommand()) return;
 
-    try {
-      const command = this.client.commands.get(interaction.commandName);
-      if (!command) return;
-
-      command.handle(interaction);
-    } catch (error) {
-      interaction.reply({
-        content: 'Deu erro',
-        ephemeral: true,
-      });
-    }
+    const command = this.client.commands.find((c) => c.name === interaction.commandName);
+    command && command.handle(interaction);
   }
 }

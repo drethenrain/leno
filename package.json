@@ -7,7 +7,7 @@
   "scripts": {
     "build": "sucrase src/ -d dist/ --transforms typescript,imports",
     "dev": "nodemon src/index.ts",
-    "start": "node -r sucrase/register ."
+    "start": "sucrase-node ."
   },
   "dependencies": {
     "discord.js": "^14.0.3",
