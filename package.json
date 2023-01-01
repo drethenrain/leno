@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "discord.js": "^14.0.3",
+    "ent": "^2.2.0",
     "undici": "^5.13.0"
   },
   "devDependencies": {
+    "@types/ent": "^2.2.5",
     "dotenv": "^16.0.1",
     "nodemon": "^2.0.19",
     "sucrase": "^3.24.0",

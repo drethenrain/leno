@@ -10,6 +10,9 @@ import Command from '../core/Command';
 import { currencyFormatToBRL } from '../utils';
 
 export default class extends Command {
+  private baseUrl: string;
+  private productUrl: (id: string) => string;
+
   constructor(client: Client) {
     super(client, {
       name: 'kabum',
@@ -23,6 +26,9 @@ export default class extends Command {
         },
       ],
     });
+
+    this.baseUrl = 'https://servicespub.prod.api.aws.grupokabum.com.br';
+    this.productUrl = (id: string) => `https://www.kabum.com.br/produto/${id}`;
   }
 
   async handle(interaction: ChatInputCommandInteraction) {
@@ -37,7 +43,9 @@ export default class extends Command {
           products
             .map(
               (product) =>
-                `${currencyFormatToBRL(product.price)} - [${product.title}](${product.link})`
+                `${currencyFormatToBRL(product.price)} - [${
+                  product.title
+                }](${product.link}) (${product.id}) `
             )
             .join('\n')
         )
@@ -54,11 +62,8 @@ export default class extends Command {
   }
 
   private async searchProduct(product: string) {
-    const baseUrl = 'https://servicespub.prod.api.aws.grupokabum.com.br';
-    const productUrl = (id: string) => `https://www.kabum.com.br/produto/${id}`;
-
     const { body } = await request(
-      `${baseUrl}/catalog/v2/products?query=${product}&page_size=15`,
+      `${this.baseUrl}/catalog/v2/products?query=${product}&page_size=15`,
       {
         headers: {
           'user-agent': 'Mozilla/5.0 Chrome/108.0.0.0 Safari/537.36',
@@ -73,14 +78,13 @@ export default class extends Command {
       const { id, attributes } = product;
 
       products.push({
+        id,
         title: attributes.title,
         price: attributes.price,
-        link: productUrl(id),
+        link: this.productUrl(id),
         photos: attributes.photos,
       });
     }
     return products;
   }
-
 }
-
