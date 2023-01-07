@@ -66,8 +66,9 @@ export default class extends Command {
         const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
             .setCustomId('details')
+            // SORRIZO RONALDO 
             .setStyle(
-              toggle === true && choice === 'details'
+              toggle && choice === 'details'
                 ? ButtonStyle.Secondary
                 : ButtonStyle.Success
             )
